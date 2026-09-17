@@ -1,0 +1,113 @@
+%% ============================================================================
+%% Agent Communication RPC Framework - 完整架构图 (Mermaid)
+%% 渲染方式: https://mermaid.live 或 VS Code Mermaid 插件 / Typora
+%% ============================================================================
+
+flowchart TB
+    %% ==================== 应用层 ====================
+    subgraph APP["应用层 (Application Layer)"]
+        RC["RPC Client<br/>(client/rpc_client)"]
+        AC["AI Client<br/>(ai_query_client)"]
+        CLI["CLI 工具<br/>(client_example)"]
+    end
+
+    %% ==================== 服务层 ====================
+    subgraph SVC["RPC 服务层 (server/)  gRPC + Protobuf"]
+        RS["RPC Server<br/>监听 0.0.0.0:50051"]
+        AQS["AIQueryService<br/>Query / QueryStream / GetQueryStatus"]
+        ACS["AgentCommunicationService<br/>消息收发 / 注册 / 心跳 / 流式"]
+        HS["HealthService<br/>健康检查"]
+        RS --- AQS
+        RS --- ACS
+        RS --- HS
+    end
+
+    %% ==================== 适配层 ====================
+    subgraph ADAPT["A2A 适配层 (a2a_adapter/)  适配器模式"]
+        ADA["A2AAdapter<br/>主适配器"]
+        REQ["RequestAdapter<br/>gRPC 请求 → A2A 消息"]
+        RES["ResponseAdapter<br/>A2A 响应 → gRPC 响应"]
+        EM["ErrorMapper<br/>错误码映射"]
+        TMW["TaskManagerWrapper<br/>任务状态管理"]
+        RPY["RetryPolicy<br/>重试策略"]
+        ADA --- REQ
+        ADA --- RES
+        ADA --- EM
+        ADA --- TMW
+        ADA --- RPY
+    end
+
+    %% ==================== 协调层 ====================
+    subgraph ORCH["Agent 协调层 (orchestrator/ + examples/ai_orchestrator)"]
+        OR["Orchestrator Agent<br/>端口 5000<br/>A2A JSON-RPC 端点"]
+        INT["意图识别<br/>Qwen API<br/>(math / code / general)"]
+        ROUTER["AgentRouter<br/>技能匹配 / 轮询 / 随机"]
+        REGC["RegistryClient<br/>服务发现 + 心跳"]
+        MCPAI["MCPAgentIntegration<br/>工具发现 / 调用 / 降级"]
+        RAG["RAG-MCP 智能工具选择<br/>Embedding → VectorIndex<br/>→ ToolRetriever (Top-K)"]
+        OR --- INT
+        OR --- ROUTER
+        OR --- REGC
+        OR --- MCPAI
+        MCPAI --- RAG
+    end
+
+    %% ==================== Agent 层 ====================
+    subgraph AGENTS["专业 Agent 层 (examples/ai_orchestrator/)"]
+        MA["Math Agent<br/>端口 5001<br/>tags: math, calculator"]
+        CA["Code Agent<br/>(可扩展)"]
+        OA["Other Agent<br/>(可扩展)"]
+        MAI["MCPAgentIntegration + RAG"]
+        MA --- MAI
+    end
+
+    %% ==================== 工具层 ====================
+    subgraph TOOLS["MCP 工具层 (mcp_server_integrated/)"]
+        MS["MCP Server<br/>插件宿主 + 动态加载"]
+        P1["calculator 插件<br/>表达式解析器"]
+        P2["weather 插件"]
+        P3["sleep / notification<br/>等插件"]
+        P4["自定义插件<br/>(实现 PluginAPI)"]
+        MS --- P1
+        MS --- P2
+        MS --- P3
+        MS --- P4
+    end
+
+    %% ==================== 基础设施 ====================
+    subgraph INFRA["基础设施 (Infrastructure)"]
+        REG["Registry Server<br/>端口 8500<br/>Agent 注册 / 发现 / 心跳"]
+        REDIS[("Redis<br/>任务状态 + 历史消息<br/>(RedisTaskStore)")]
+        QWEN[("通义千问 API<br/>QWEN_API_KEY")]
+        DASH[("DashScope API<br/>DASHSCOPE_API_KEY<br/>文本向量化")]
+    end
+
+    %% ==================== 连接关系 ====================
+    RC -- "gRPC/Protobuf (50051)" --> RS
+    AC -- "gRPC/Protobuf (50051)" --> RS
+    CLI -- "gRPC/Protobuf (50051)" --> RS
+
+    AQS -- "同步 / 流式查询" --> ADA
+    ADA -- "A2A 协议 (HTTP/JSON-RPC)" --> OR
+
+    OR -- "意图识别" --> INT
+    INT -- "调用" --> QWEN
+    OR -- "按 tag 查找 Agent" --> REGC
+    REGC -- "register / heartbeat / discover" --> REG
+    OR -- "路由转发 message/send" --> MA
+    OR -- "路由转发 message/send" --> CA
+    OR -- "路由转发 message/send" --> OA
+
+    MAI -- "STDIO / SSE" --> MS
+    RAG -- "文本向量化" --> DASH
+
+    MA -- "读写" --> REDIS
+    OR -- "读写" --> REDIS
+
+    %% ==================== 图例 ====================
+    classDef layer fill:#e8f0fe,stroke:#4285f4,stroke-width:1px
+    classDef protocol fill:#fef7e0,stroke:#f9ab00,stroke-width:1px
+    classDef infra fill:#e6f4ea,stroke:#34a853,stroke-width:1px
+    class APP,SVC,ADAPT,ORCH,AGENTS,TOOLS layer
+    class AQS,ADA,OR protocol
+    class REG,REDIS,QWEN,DASH infra

@@ -1,0 +1,351 @@
+{
+  "version": 2,
+  "nodes": [
+    {
+      "type": "frame",
+      "id": "root",
+      "x": 0,
+      "y": 0,
+      "width": 1180,
+      "height": "fit-content",
+      "layout": "vertical",
+      "gap": 14,
+      "padding": 24,
+      "children": [
+        {
+          "type": "text",
+          "id": "title",
+          "width": "fill-container",
+          "height": "fit-content",
+          "text": "三层拆解：mcp_server → mcp → a2a_sdk（自底向上看能力与协议）",
+          "fontSize": 20,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "frame",
+          "id": "row-a2a",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-a2a",
+              "width": 120,
+              "height": "fit-content",
+              "text": "a2a_sdk\n(通信底座)",
+              "fontSize": 15,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-a2a",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#EAE2FE",
+              "borderColor": "#8569CB",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "orchestrator",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Orchestrator\n意图识别 + 路由 :5000",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "math-agent",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Math Agent\n数学处理 :5001",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "sdk-core",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "a2a 核心件（进程内）\nAgentCard / Task 状态机\nJSON-RPC / TaskStore",
+                  "fillColor": "#EAE2FE",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 13,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-mcp",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-mcp",
+              "width": 120,
+              "height": "fit-content",
+              "text": "mcp 模块\n(进程内集成)",
+              "fontSize": 15,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-mcp",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#FEF1CE",
+              "borderColor": "#D4B45B",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "mcp-integ",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "MCPAgentIntegration\n门面 API\ninitialize / callTool",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "mcp-client",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "MCPClient + ToolManager\n工具发现与调用\nSTDIO / SSE",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "rag",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "RAG-MCP\nEmbedding → VectorIndex\n→ Top-K 工具检索",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-server",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-server",
+              "width": 120,
+              "height": "fit-content",
+              "text": "mcp_server\n(独立进程)",
+              "fontSize": 15,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-server",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#F0F4FC",
+              "borderColor": "#5178C6",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "mcp-server",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "MCP Server\n插件宿主（可选）\n按 MCP 标准暴露工具",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "calc-plugin",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "calculator 插件\n确定性计算\n(表达式解析器)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 13,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "other-plugin",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "weather / sleep 等\n工具插件（可扩展）",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 13,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "note-row",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 14,
+          "padding": 0,
+          "alignItems": "center",
+          "justifyContent": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "note-a2a",
+              "width": "fill-container",
+              "height": "fit-content",
+              "text": "a2a_sdk：让 Agent 之间有协议、任务有状态",
+              "fontSize": 13,
+              "textColor": "#646A73",
+              "textAlign": "center"
+            },
+            {
+              "type": "text",
+              "id": "note-mcp",
+              "width": "fill-container",
+              "height": "fit-content",
+              "text": "mcp：让 Agent 有工具可调（降级 + RAG 选工具）",
+              "fontSize": 13,
+              "textColor": "#646A73",
+              "textAlign": "center"
+            },
+            {
+              "type": "text",
+              "id": "note-server",
+              "width": "fill-container",
+              "height": "fit-content",
+              "text": "mcp_server：让工具生产出来（插件化、语言无关）",
+              "fontSize": 13,
+              "textColor": "#646A73",
+              "textAlign": "center"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "math-agent",
+        "to": "mcp-integ",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "进程内调用",
+        "labelPosition": 0.5
+      }
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "mcp-integ",
+        "to": "mcp-server",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "STDIO / SSE",
+        "labelPosition": 0.5
+      }
+    }
+  ]
+}

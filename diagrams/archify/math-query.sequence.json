@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "数学请求：从 gRPC 入口到 MCP 工具调用",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1080, 860],
+    "column_fit": "spread",
+    "views": [
+      {"id": "grpc-to-a2a", "label": "协议转换", "focus": ["client", "rpc-server", "adapter", "orchestrator"], "note": "业务侧只调用稳定的 gRPC 接口；Adapter 将请求转换为 A2A。"},
+      {"id": "route-agent", "label": "发现并路由", "focus": ["orchestrator", "qwen", "registry", "math-agent"], "note": "Orchestrator 先识别 math 意图，再根据 Registry 的标签记录选择专业 Agent。"},
+      {"id": "tool-and-return", "label": "工具调用与返回", "focus": ["math-agent", "redis", "mcp-server", "client"], "note": "Math Agent 读取上下文，按需调用计算器工具，再将结果沿原链路返回。"}
+    ]
+  },
+  "participants": [
+    {"id": "client", "type": "frontend", "label": "RPC Client", "sublabel": "业务调用方"},
+    {"id": "rpc-server", "type": "backend", "label": "RPC Server", "sublabel": "AIQueryService"},
+    {"id": "adapter", "type": "backend", "label": "A2A Adapter", "sublabel": "协议转换"},
+    {"id": "orchestrator", "type": "backend", "label": "Orchestrator", "sublabel": "意图 + 路由"},
+    {"id": "qwen", "type": "external", "label": "Qwen API", "sublabel": "分类 / 生成"},
+    {"id": "registry", "type": "database", "label": "Registry", "sublabel": "Agent 标签"},
+    {"id": "math-agent", "type": "backend", "label": "Math Agent", "sublabel": "数学处理"},
+    {"id": "redis", "type": "database", "label": "Redis", "sublabel": "会话历史"},
+    {"id": "mcp-server", "type": "backend", "label": "MCP Server", "sublabel": "calculator 工具"}
+  ],
+  "segments": [
+    {"from": 148, "to": 292, "label": "业务接入与协议转换"},
+    {"from": 310, "to": 478, "label": "意图识别与 Agent 路由"},
+    {"from": 496, "to": 758, "label": "上下文、工具与回答"}
+  ],
+  "messages": [
+    {"id": "query", "from": "client", "to": "rpc-server", "y": 174, "label": "Query(\"计算 12 × 7\") · gRPC", "variant": "emphasis"},
+    {"id": "process", "from": "rpc-server", "to": "adapter", "y": 218, "label": "processQuery(AIQueryRequest)", "variant": "emphasis"},
+    {"id": "a2a-send", "from": "adapter", "to": "orchestrator", "y": 262, "label": "message/send · HTTP / JSON-RPC", "variant": "emphasis"},
+    {"id": "classify", "from": "orchestrator", "to": "qwen", "y": 334, "label": "识别意图：math", "variant": "default"},
+    {"id": "intent", "from": "qwen", "to": "orchestrator", "y": 378, "label": "math", "variant": "return"},
+    {"id": "discover", "from": "orchestrator", "to": "registry", "y": 422, "label": "select_agent_by_tag(\"math\")", "variant": "default"},
+    {"id": "agent-url", "from": "registry", "to": "orchestrator", "y": 466, "label": "Math Agent :5001", "variant": "return"},
+    {"id": "dispatch", "from": "orchestrator", "to": "math-agent", "y": 522, "label": "message/send · A2A", "variant": "emphasis"},
+    {"id": "history", "from": "math-agent", "to": "redis", "y": 566, "label": "读取最近对话历史", "variant": "default"},
+    {"id": "history-return", "from": "redis", "to": "math-agent", "y": 610, "label": "历史消息", "variant": "return"},
+    {"id": "tool-call", "from": "math-agent", "to": "mcp-server", "y": 654, "label": "calculator(expression) · 可选", "variant": "emphasis"},
+    {"id": "tool-result", "from": "mcp-server", "to": "math-agent", "y": 698, "label": "84", "variant": "return"},
+    {"id": "answer", "from": "math-agent", "to": "client", "y": 752, "label": "答案沿 A2A → Adapter → gRPC 原路返回", "variant": "return", "note": "图中将中间三次返回聚合为一条，突出用户可见结果。"}
+  ],
+  "activations": [
+    {"participant": "rpc-server", "from": 168, "to": 288, "type": "backend"},
+    {"participant": "adapter", "from": 212, "to": 300, "type": "backend"},
+    {"participant": "orchestrator", "from": 256, "to": 528, "type": "backend"},
+    {"participant": "qwen", "from": 328, "to": 384, "type": "external"},
+    {"participant": "registry", "from": 416, "to": 472, "type": "database"},
+    {"participant": "math-agent", "from": 516, "to": 758, "type": "backend"},
+    {"participant": "redis", "from": 560, "to": 616, "type": "database"},
+    {"participant": "mcp-server", "from": 648, "to": 704, "type": "backend"}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "协议边界", "items": ["Client → RPC Server 使用 gRPC / Protobuf", "Adapter → Orchestrator 使用 A2A 的 HTTP / JSON-RPC", "业务方无需理解底层 Agent 拓扑"]},
+    {"dot": "emerald", "title": "可靠性与可选能力", "items": ["MCP 不可用时，Math Agent 可继续由模型回答", "Redis 保存上下文，支持多轮对话", "流式路径改用 QueryStream / message/stream / SSE"]}
+  ]
+}

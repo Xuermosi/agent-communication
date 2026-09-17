@@ -1,0 +1,789 @@
+{
+  "version": 2,
+  "nodes": [
+    {
+      "type": "frame",
+      "id": "root",
+      "x": 0,
+      "y": 0,
+      "width": 1240,
+      "height": "fit-content",
+      "layout": "vertical",
+      "gap": 14,
+      "padding": 24,
+      "children": [
+        {
+          "type": "text",
+          "id": "title",
+          "width": "fill-container",
+          "height": "fit-content",
+          "text": "Agent Communication RPC Framework 系统架构",
+          "fontSize": 24,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "frame",
+          "id": "row-app",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-app",
+              "width": 76,
+              "height": "fit-content",
+              "text": "应用层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-app",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#F0F4FC",
+              "borderColor": "#5178C6",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "rpc_client",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "RPC Client\n(rpc_client)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "ai_client",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "AI Client\n(ai_query_client)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "cli",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "CLI 工具\n(client_example)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-svc",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-svc",
+              "width": 76,
+              "height": "fit-content",
+              "text": "服务层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-svc",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#EAE2FE",
+              "borderColor": "#8569CB",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "rpc_server",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "RPC Server\n监听 0.0.0.0:50051\n(gRPC + Protobuf)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "ai_query",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "AIQueryService\nQuery / QueryStream\n/ GetQueryStatus",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "agent_svc",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "AgentService\n消息收发 / 注册\n/ 心跳 / 流式",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "health",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "HealthService\n健康检查",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-adapt",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-adapt",
+              "width": 76,
+              "height": "fit-content",
+              "text": "适配层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-adapt",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#DFF5E5",
+              "borderColor": "#509863",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "a2a_adapter",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "A2AAdapter\n主适配器\n(适配器模式)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#509863",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "req_adapter",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "RequestAdapter\ngRPC 请求 → A2A 消息",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#509863",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "resp_adapter",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "ResponseAdapter\nA2A 响应 → gRPC 响应",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#509863",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "err_mapper",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "ErrorMapper\n错误码映射",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#509863",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "task_mgr",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "TaskManager\n任务状态管理",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#509863",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-orch",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-orch",
+              "width": 76,
+              "height": "fit-content",
+              "text": "协调层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-orch",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#FEF1CE",
+              "borderColor": "#D4B45B",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "orchestrator",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Orchestrator\n端口 5000\n(A2A JSON-RPC 端点)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "intent",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "意图识别\nQwen API\n(math/code/general)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "router",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "AgentRouter\n技能匹配 / 轮询\n/ 随机",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "mcp_integ",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "MCPAgentIntegration\n工具发现 / 调用\n/ 降级",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "rag",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "RAG-MCP\nEmbedding → 向量索引\n→ Top-K 检索",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D4B45B",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-agent",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-agent",
+              "width": 76,
+              "height": "fit-content",
+              "text": "Agent 层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-agent",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#FEE3E2",
+              "borderColor": "#D25D5A",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "math_agent",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Math Agent\n端口 5001\n(tags: math, calculator)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D25D5A",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "code_agent",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Code Agent\n(可扩展)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D25D5A",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "other_agent",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "Other Agent\n(可扩展)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#D25D5A",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-tools",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-tools",
+              "width": 76,
+              "height": "fit-content",
+              "text": "工具层",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-tools",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "fillColor": "#F0F4FC",
+              "borderColor": "#5178C6",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "mcp_server",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "MCP Server\n插件宿主\n(STDIO / SSE)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "calc",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "calculator 插件\n表达式解析",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "weather",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "weather 插件\n天气查询",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "rect",
+                  "id": "sleep",
+                  "width": "fill-container",
+                  "height": "fit-content",
+                  "text": "sleep 等插件\n(可扩展)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#5178C6",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "row-infra",
+          "width": "fill-container",
+          "height": "fit-content",
+          "layout": "horizontal",
+          "gap": 20,
+          "padding": 0,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "label-infra",
+              "width": 76,
+              "height": "fit-content",
+              "text": "基础设施",
+              "fontSize": 18,
+              "textColor": "#1F2329",
+              "textAlign": "right"
+            },
+            {
+              "type": "frame",
+              "id": "layer-infra",
+              "width": "fill-container",
+              "height": "fit-content",
+              "layout": "horizontal",
+              "gap": 14,
+              "padding": 16,
+              "alignItems": "stretch",
+              "justifyContent": "space-around",
+              "fillColor": "#EAE2FE",
+              "borderColor": "#8569CB",
+              "borderWidth": 2,
+              "borderRadius": 8,
+              "children": [
+                {
+                  "type": "rect",
+                  "id": "registry",
+                  "width": 190,
+                  "height": "fit-content",
+                  "text": "Registry Server\n端口 8500\n注册 / 发现 / 心跳",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "borderRadius": 8,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "cylinder",
+                  "id": "redis",
+                  "width": 160,
+                  "height": "fit-content",
+                  "text": "Redis\n任务状态 + 历史",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "cylinder",
+                  "id": "qwen",
+                  "width": 160,
+                  "height": "fit-content",
+                  "text": "通义千问 API\n对话 / 意图识别",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                },
+                {
+                  "type": "cylinder",
+                  "id": "dashscope",
+                  "width": 170,
+                  "height": "fit-content",
+                  "text": "DashScope API\n文本向量化 (Embedding)",
+                  "fillColor": "#FFFFFF",
+                  "borderColor": "#8569CB",
+                  "borderWidth": 2,
+                  "fontSize": 14,
+                  "textColor": "#1F2329",
+                  "textAlign": "center",
+                  "verticalAlign": "middle"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "rpc_client",
+        "to": "rpc_server",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "gRPC (50051)",
+        "labelPosition": 0.5
+      }
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "a2a_adapter",
+        "to": "orchestrator",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "A2A / HTTP",
+        "labelPosition": 0.5
+      }
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "orchestrator",
+        "to": "math_agent",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "message/send",
+        "labelPosition": 0.5
+      }
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "math_agent",
+        "to": "mcp_server",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "endArrow": "arrow",
+        "label": "STDIO / SSE",
+        "labelPosition": 0.5
+      }
+    },
+    {
+      "type": "connector",
+      "connector": {
+        "from": "orchestrator",
+        "to": "registry",
+        "fromAnchor": "bottom",
+        "toAnchor": "top",
+        "lineShape": "rightAngle",
+        "lineColor": "#BBBFC4",
+        "lineWidth": 2,
+        "lineStyle": "dashed",
+        "endArrow": "arrow",
+        "label": "register / discover",
+        "labelPosition": 0.5
+      }
+    }
+  ]
+}

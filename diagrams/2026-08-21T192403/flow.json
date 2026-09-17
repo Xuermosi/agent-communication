@@ -1,0 +1,163 @@
+{
+  "version": 2,
+  "nodes": [
+    {
+      "type": "frame",
+      "id": "root",
+      "x": 20,
+      "y": 20,
+      "layout": "dagre",
+      "width": "fit-content",
+      "height": "fit-content",
+      "padding": 48,
+      "fillColor": "#F8FAFC",
+      "borderColor": "#CBD5E1",
+      "borderWidth": 1,
+      "borderRadius": 16,
+      "layoutOptions": {
+        "rankdir": "LR",
+        "nodesep": 50,
+        "ranksep": 150,
+        "edges": [
+          ["user", "rpc_client", "gRPC (50051)"],
+          ["rpc_client", "rpc_server", "Query"],
+          ["rpc_server", "a2a_adapter", "processQuery"],
+          ["a2a_adapter", "orchestrator", "A2A / HTTP"],
+          ["orchestrator", "math_agent", "意图=math"],
+          ["math_agent", "mcp_server", "STDIO / SSE"],
+          ["mcp_server", "result", "1+7 = 8"]
+        ]
+      },
+      "children": [
+        {
+          "type": "text",
+          "id": "title",
+          "width": "fit-content",
+          "height": "fit-content",
+          "text": "同步查询数据流 — “1+7” 的完整链路",
+          "fontSize": 20,
+          "textColor": "#1F2329",
+          "textAlign": "center"
+        },
+        {
+          "type": "ellipse",
+          "id": "user",
+          "text": "用户\n输入 1+7",
+          "width": 110,
+          "height": 60,
+          "fillColor": "#F0F4FC",
+          "borderColor": "#5178C6",
+          "borderWidth": 2,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "rpc_client",
+          "text": "RPC Client\n发送 AIQueryRequest",
+          "width": 150,
+          "height": 56,
+          "fillColor": "#FFFFFF",
+          "borderColor": "#5178C6",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "rpc_server",
+          "text": "RPC Server (50051)\nAIQueryService.Query()",
+          "width": 160,
+          "height": 56,
+          "fillColor": "#FFFFFF",
+          "borderColor": "#5178C6",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "a2a_adapter",
+          "text": "A2A Adapter\n转换请求为 A2A 消息",
+          "width": 160,
+          "height": 56,
+          "fillColor": "#FFFFFF",
+          "borderColor": "#5178C6",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "diamond",
+          "id": "orchestrator",
+          "text": "Orchestrator (5000)\n意图识别 → math\n查找 Math Agent",
+          "width": 150,
+          "height": 90,
+          "fillColor": "#FEF1CE",
+          "borderColor": "#D4B45B",
+          "borderWidth": 2,
+          "fontSize": 13,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "math_agent",
+          "text": "Math Agent (5001)\nRAG 检索 calculator 工具",
+          "width": 160,
+          "height": 56,
+          "fillColor": "#FFFFFF",
+          "borderColor": "#8569CB",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "mcp_server",
+          "text": "MCP Server\ncalculator 插件执行计算",
+          "width": 160,
+          "height": 56,
+          "fillColor": "#FFFFFF",
+          "borderColor": "#8569CB",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        },
+        {
+          "type": "rect",
+          "id": "result",
+          "text": "返回结果\n1+7 = 8\n(响应沿原路返回)",
+          "width": 130,
+          "height": 72,
+          "fillColor": "#DFF5E5",
+          "borderColor": "#509863",
+          "borderWidth": 2,
+          "borderRadius": 8,
+          "fontSize": 14,
+          "textColor": "#1F2329",
+          "textAlign": "center",
+          "verticalAlign": "middle"
+        }
+      ]
+    }
+  ]
+}

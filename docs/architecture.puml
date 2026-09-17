@@ -1,0 +1,113 @@
+' ============================================================================
+' Agent Communication RPC Framework - 完整架构图 (PlantUML)
+' 渲染方式: https://www.plantuml.com/plantuml 或 IDE PlantUML 插件
+' ============================================================================
+
+@startuml
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam defaultFontName "Microsoft YaHei"
+skinparam monochrome false
+title Agent Communication RPC Framework 系统架构
+
+' ==================== 应用层 ====================
+package "应用层 (Application Layer)" #e8f0fe {
+    [RPC Client\n(client/rpc_client)] as RC
+    [AI Client\n(ai_query_client)] as AC
+    [CLI 工具\n(client_example)] as CLI
+}
+
+' ==================== 服务层 ====================
+package "RPC 服务层 (server/)  gRPC + Protobuf" #fef7e0 {
+    component "RPC Server\n监听 0.0.0.0:50051" as RS
+    component "AIQueryService\nQuery / QueryStream\n/ GetQueryStatus" as AQS
+    component "AgentCommunicationService\n消息收发 / 注册 / 心跳 / 流式" as ACS
+    component "HealthService\n健康检查" as HS
+    RS --> AQS
+    RS --> ACS
+    RS --> HS
+}
+
+' ==================== 适配层 ====================
+package "A2A 适配层 (a2a_adapter/)  适配器模式" #fce8e6 {
+    component "A2AAdapter\n主适配器" as ADA
+    component "RequestAdapter\ngRPC 请求 → A2A 消息" as REQ
+    component "ResponseAdapter\nA2A 响应 → gRPC 响应" as RES
+    component "ErrorMapper\n错误码映射" as EM
+    component "TaskManagerWrapper\n任务状态管理" as TMW
+    component "RetryPolicy\n重试策略" as RPY
+    ADA --> REQ
+    ADA --> RES
+    ADA --> EM
+    ADA --> TMW
+    ADA --> RPY
+}
+
+' ==================== 协调层 ====================
+package "Agent 协调层\n(orchestrator/ + examples/ai_orchestrator)" #e6f4ea {
+    component "Orchestrator Agent\n端口 5000\nA2A JSON-RPC 端点" as OR
+    component "意图识别\nQwen API\n(math / code / general)" as INT
+    component "AgentRouter\n技能匹配 / 轮询 / 随机" as ROUTER
+    component "RegistryClient\n服务发现 + 心跳" as REGC
+    component "MCPAgentIntegration\n工具发现 / 调用 / 降级" as MCPAI
+    component "RAG-MCP 智能工具选择\nEmbedding → VectorIndex\n→ ToolRetriever (Top-K)" as RAG
+    OR --> INT
+    OR --> ROUTER
+    OR --> REGC
+    OR --> MCPAI
+    MCPAI --> RAG
+}
+
+' ==================== Agent 层 ====================
+package "专业 Agent 层 (examples/ai_orchestrator/)" #fff3e0 {
+    component "Math Agent\n端口 5001\ntags: math, calculator" as MA
+    component "Code Agent\n(可扩展)" as CA
+    component "Other Agent\n(可扩展)" as OA
+    component "MCPAgentIntegration\n+ RAG" as MAI
+    MA --> MAI
+}
+
+' ==================== 工具层 ====================
+package "MCP 工具层 (mcp_server_integrated/)" #f3e8fd {
+    component "MCP Server\n插件宿主 + 动态加载" as MS
+    component "calculator 插件\n表达式解析器" as P1
+    component "weather 插件" as P2
+    component "sleep / notification\n等插件" as P3
+    component "自定义插件\n(实现 PluginAPI)" as P4
+    MS --> P1
+    MS --> P2
+    MS --> P3
+    MS --> P4
+}
+
+' ==================== 基础设施 ====================
+package "基础设施 (Infrastructure)" #e0f7fa {
+    component "Registry Server\n端口 8500\nAgent 注册 / 发现 / 心跳" as REG
+    database "Redis\n任务状态 + 历史消息\n(RedisTaskStore)" as REDIS
+    cloud "通义千问 API\nQWEN_API_KEY" as QWEN
+    cloud "DashScope API\nDASHSCOPE_API_KEY\n文本向量化" as DASH
+}
+
+' ==================== 连接关系 ====================
+RC -down-> RS : gRPC/Protobuf (50051)
+AC -down-> RS : gRPC/Protobuf (50051)
+CLI -down-> RS : gRPC/Protobuf (50051)
+
+AQS -down-> ADA : 同步 / 流式查询
+ADA -down-> OR : A2A 协议 (HTTP/JSON-RPC)
+
+OR -down-> INT : 意图识别
+INT -down-> QWEN : 调用
+OR -down-> REGC : 按 tag 查找 Agent
+REGC -down-> REG : register / heartbeat / discover
+OR -down-> MA : 路由转发 message/send
+OR -down-> CA : 路由转发 message/send
+OR -down-> OA : 路由转发 message/send
+
+MAI -down-> MS : STDIO / SSE
+RAG -down-> DASH : 文本向量化
+
+MA -down-> REDIS : 读写
+OR -down-> REDIS : 读写
+
+@enduml

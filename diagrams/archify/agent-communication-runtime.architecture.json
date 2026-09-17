@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AI Agent Communication RPC Framework — 运行时架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [1320, 720],
+    "views": [
+      {
+        "id": "primary-request",
+        "label": "主请求链路",
+        "focus": ["rpc-client", "rpc-server", "a2a-adapter", "orchestrator", "math-agent", "mcp-server"],
+        "note": "业务请求从 gRPC 入口转成 A2A 消息，由编排器路由至专业 Agent。"
+      },
+      {
+        "id": "agent-discovery",
+        "label": "Agent 发现与会话",
+        "focus": ["orchestrator", "registry", "math-agent", "redis"],
+        "note": "Orchestrator 按标签发现健康 Agent；会话历史由 Redis Task Store 保存。"
+      },
+      {
+        "id": "optional-tools",
+        "label": "可选工具与 RAG",
+        "focus": ["math-agent", "mcp-server", "calculator", "dashscope"],
+        "note": "MCP 与 RAG-MCP 是可选增强：不可用时可降级为不调用工具或全量工具候选。"
+      }
+    ]
+  },
+  "components": [
+    {"id": "rpc-client", "type": "frontend", "label": "RPC Client", "sublabel": "业务调用方", "tag": "gRPC / Protobuf", "pos": [42, 310], "size": [132, 68]},
+    {"id": "rpc-server", "type": "backend", "label": "RPC Server", "sublabel": "AIQueryService :50051", "tag": "gRPC boundary", "pos": [220, 310], "size": [142, 68]},
+    {"id": "a2a-adapter", "type": "backend", "label": "A2A Adapter", "sublabel": "请求 / 响应协议转换", "tag": "gRPC ↔ A2A", "pos": [408, 310], "size": [148, 68]},
+    {"id": "orchestrator", "type": "backend", "label": "Orchestrator", "sublabel": "意图识别 + 路由 :5000", "tag": "A2A coordinator", "pos": [602, 310], "size": [156, 68]},
+    {"id": "math-agent", "type": "backend", "label": "Math Agent", "sublabel": "数学专业 Agent :5001", "tag": "A2A agent", "pos": [808, 310], "size": [154, 68]},
+    {"id": "mcp-server", "type": "backend", "label": "MCP Server", "sublabel": "工具宿主（可选）", "tag": "STDIO / SSE", "pos": [1012, 310], "size": [142, 68]},
+    {"id": "calculator", "type": "external", "label": "Calculator 插件", "sublabel": "确定性计算工具", "tag": "MCP plugin", "pos": [1184, 310], "size": [118, 68]},
+    {"id": "registry", "type": "database", "label": "Registry Server", "sublabel": "注册 / 标签发现 :8500", "tag": "Agent discovery", "pos": [604, 126], "size": [152, 66]},
+    {"id": "redis", "type": "database", "label": "Redis", "sublabel": "Task Store / 对话历史", "tag": "会话状态", "pos": [808, 526], "size": [154, 66]},
+    {"id": "qwen", "type": "external", "label": "Qwen API", "sublabel": "意图识别与回答生成", "tag": "LLM", "pos": [604, 526], "size": [152, 66]},
+    {"id": "dashscope", "type": "external", "label": "DashScope API", "sublabel": "Embedding（RAG 可选）", "tag": "向量化", "pos": [1012, 526], "size": [142, 66]}
+  ],
+  "connections": [
+    {"id": "client-rpc", "from": "rpc-client", "to": "rpc-server", "label": "gRPC / Protobuf", "labelDy": -28, "variant": "emphasis"},
+    {"id": "rpc-adapter", "from": "rpc-server", "to": "a2a-adapter", "label": "AIQueryRequest", "labelDy": -28, "variant": "emphasis"},
+    {"id": "adapter-orchestrator", "from": "a2a-adapter", "to": "orchestrator", "label": "A2A · HTTP / JSON-RPC", "labelDy": -28, "variant": "emphasis"},
+    {"id": "orchestrator-math", "from": "orchestrator", "to": "math-agent", "label": "按 math 标签分发", "labelDy": -28, "variant": "emphasis"},
+    {"id": "math-mcp", "from": "math-agent", "to": "mcp-server", "label": "MCP tool call（可选）", "labelDy": -28},
+    {"id": "mcp-calculator", "from": "mcp-server", "to": "calculator", "label": "调用插件", "labelDy": -28},
+    {"id": "orchestrator-registry", "from": "orchestrator", "to": "registry", "label": "查询 Agent 标签", "fromSide": "top", "toSide": "bottom"},
+    {"id": "orchestrator-qwen", "from": "orchestrator", "to": "qwen", "label": "意图识别", "fromSide": "bottom", "toSide": "top", "labelDy": 24},
+    {"id": "math-qwen", "from": "math-agent", "to": "qwen", "label": "生成数学回答", "fromSide": "bottom", "toSide": "right", "variant": "dashed"},
+    {"id": "math-redis", "from": "math-agent", "to": "redis", "label": "读写会话历史", "fromSide": "bottom", "toSide": "top", "labelDx": -65, "labelDy": 24},
+    {"id": "mcp-dashscope", "from": "mcp-server", "to": "dashscope", "label": "RAG 工具向量化（可选）", "fromSide": "bottom", "toSide": "top", "labelDy": 24, "variant": "dashed"}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "主职责分层", "items": ["gRPC 面向业务接入；A2A 面向 Agent 协作", "Adapter 隔离外部接口与 Agent 协议", "Orchestrator 只负责识别、发现和分发"]},
+    {"dot": "emerald", "title": "可靠性与降级", "items": ["RPC 层具备熔断、日志和指标", "MCP Server 不可用时 Agent 仍可走模型回答", "RAG 不可用时可回退至工具候选列表"]}
+  ]
+}
