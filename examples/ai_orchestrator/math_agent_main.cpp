@@ -30,6 +30,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <cstdlib>
 
 using namespace a2a;
 using json = nlohmann::json;
@@ -314,7 +315,7 @@ private:
         if (!mcp_integration_ || !mcp_integration_->isAvailable()) {
             return "";
         }
-        
+
         // 使用 RAG 智能检索相关工具
         std::vector<ToolInfo> relevant_tools;
         if (mcp_integration_->isRAGEnabled()) {
@@ -429,7 +430,7 @@ void print_usage(const char* program) {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc < 5) {
+    if (argc < 4) {
         print_usage(argv[0]);
         return 1;
     }
@@ -437,7 +438,19 @@ int main(int argc, char* argv[]) {
     std::string agent_id = argv[1];
     int port = std::stoi(argv[2]);
     std::string registry_url = argv[3];
-    std::string api_key = argv[4];
+    std::string api_key;
+    int options_start = 4;
+    if (argc > 4 && std::string(argv[4]).rfind("--", 0) != 0) {
+        api_key = argv[4];
+        options_start = 5;
+    } else if (const char* env_api_key = std::getenv("QWEN_API_KEY")) {
+        api_key = env_api_key;
+    }
+
+    if (api_key.empty()) {
+        std::cerr << "错误: 请通过 QWEN_API_KEY 环境变量或位置参数提供 API Key" << std::endl;
+        return 1;
+    }
     
     // 默认值
     std::string redis_host = "127.0.0.1";
@@ -455,7 +468,7 @@ int main(int argc, char* argv[]) {
     }
     
     // 解析其他命令行参数
-    for (int i = 5; i < argc; ++i) {
+    for (int i = options_start; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--redis-host" && i + 1 < argc) {
             redis_host = argv[++i];

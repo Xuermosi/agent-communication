@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstdlib>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <sstream>
@@ -19,6 +20,20 @@ public:
         : api_key_(api_key)
         , model_(model)
         , api_url_("https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation") {
+        const char* configured_model = std::getenv("QWEN_MODEL");
+        if (configured_model != nullptr && configured_model[0] != '\0') {
+            model_ = configured_model;
+        }
+
+        const char* compatible_base_url = std::getenv("QWEN_BASE_URL");
+        if (compatible_base_url != nullptr && compatible_base_url[0] != '\0') {
+            api_url_ = compatible_base_url;
+            while (!api_url_.empty() && api_url_.back() == '/') {
+                api_url_.pop_back();
+            }
+            api_url_ += "/chat/completions";
+            use_compatible_endpoint_ = true;
+        }
         curl_global_init(CURL_GLOBAL_DEFAULT);
     }
     
@@ -35,18 +50,23 @@ public:
     std::string chat(const std::string& system_prompt, 
                     const std::string& user_message) {
         // 构造请求 JSON
-        json request_body = {
-            {"model", model_},
-            {"input", {
-                {"messages", json::array({
-                    {{"role", "system"}, {"content", system_prompt}},
-                    {{"role", "user"}, {"content", user_message}}
-                })}
-            }},
-            {"parameters", {
-                {"result_format", "message"}
-            }}
-        };
+        json messages = json::array({
+            {{"role", "system"}, {"content", system_prompt}},
+            {{"role", "user"}, {"content", user_message}}
+        });
+        json request_body;
+        if (use_compatible_endpoint_) {
+            request_body = {
+                {"model", model_},
+                {"messages", messages}
+            };
+        } else {
+            request_body = {
+                {"model", model_},
+                {"input", {{"messages", messages}}},
+                {"parameters", {{"result_format", "message"}}}
+            };
+        }
         
         std::string request_str = request_body.dump();
         
@@ -64,14 +84,17 @@ public:
                 throw std::runtime_error(error_msg);
             }
             
-            // 提取回复内容
-            if (response_json.contains("output") && 
-                response_json["output"].contains("choices") &&
-                !response_json["output"]["choices"].empty()) {
-                
-                auto& choice = response_json["output"]["choices"][0];
-                if (choice.contains("message") && 
-                    choice["message"].contains("content")) {
+            const json* choices = nullptr;
+            if (use_compatible_endpoint_ && response_json.contains("choices")) {
+                choices = &response_json["choices"];
+            } else if (!use_compatible_endpoint_ && response_json.contains("output") &&
+                       response_json["output"].contains("choices")) {
+                choices = &response_json["output"]["choices"];
+            }
+
+            if (choices != nullptr && choices->is_array() && !choices->empty()) {
+                const auto& choice = (*choices)[0];
+                if (choice.contains("message") && choice["message"].contains("content")) {
                     return choice["message"]["content"].get<std::string>();
                 }
             }
@@ -129,4 +152,5 @@ private:
     std::string api_key_;
     std::string model_;
     std::string api_url_;
+    bool use_compatible_endpoint_ = false;
 };
