@@ -291,3 +291,17 @@ target_include_directories(test_qwen_compatible_client PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../a2a/third_party
 )
 add_test(NAME QwenCompatibleClientTest COMMAND test_qwen_compatible_client)
+
+add_executable(test_math_tool_utils
+    test_math_tool_utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../examples/ai_orchestrator/math_tool_utils.cpp
+)
+target_link_libraries(test_math_tool_utils
+    GTest::gtest
+    GTest::gtest_main
+)
+target_include_directories(test_math_tool_utils PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../examples/ai_orchestrator
+    ${CMAKE_CURRENT_SOURCE_DIR}/../a2a/third_party
+)
+add_test(NAME MathToolUtilsTest COMMAND test_math_tool_utils)
