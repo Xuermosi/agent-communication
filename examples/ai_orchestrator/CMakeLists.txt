@@ -42,6 +42,7 @@ target_link_libraries(ai_orchestrator
 # Math Agent 可执行文件
 add_executable(ai_math_agent
     math_agent_main.cpp
+    math_tool_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../../a2a/src/examples/redis_task_store.cpp
 )
 

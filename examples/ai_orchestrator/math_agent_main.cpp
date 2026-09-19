@@ -13,6 +13,7 @@
 #include "qwen_client.hpp"
 #include "http_server.hpp"
 #include "registry_client.hpp"
+#include "math_tool_utils.hpp"
 
 #include <a2a/models/agent_message.hpp>
 #include <a2a/models/agent_task.hpp>
@@ -56,7 +57,7 @@ public:
         , qwen_client_(api_key)
         , registry_client_(registry_url)
         , mcp_integration_(std::make_unique<MCPAgentIntegration>()) {
-        
+
         // 初始化 MCP 集成
         if (!mcp_integration_->initialize(mcp_config)) {
             std::cerr << "[MathAgent] MCP 初始化失败，将在无 MCP 模式下运行" << std::endl;
@@ -316,6 +317,12 @@ private:
             return "";
         }
 
+        const auto expression = agent_rpc::examples::extract_math_expression(question);
+        if (!expression.has_value()) {
+            std::cout << "[MathAgent] 未能从问题中提取 calculator 表达式" << std::endl;
+            return "";
+        }
+
         // 使用 RAG 智能检索相关工具
         std::vector<ToolInfo> relevant_tools;
         if (mcp_integration_->isRAGEnabled()) {
@@ -341,16 +348,17 @@ private:
         for (const auto& tool : relevant_tools) {
             if (tool.name == "calculator" || tool.name == "calculate" || tool.name == "math") {
                 json args;
-                args["expression"] = question;
+                args["expression"] = *expression;
                 
                 std::cout << "[MathAgent] 调用 MCP 工具: " << tool.name << std::endl;
                 
                 auto result = mcp_integration_->callTool(tool.name, args.dump());
-                if (result.success) {
+                if (result.success && agent_rpc::examples::is_usable_mcp_tool_result(result.result)) {
                     std::cout << "[MathAgent] MCP 工具返回: " << result.result << std::endl;
                     return result.result;
                 } else {
-                    std::cerr << "[MathAgent] MCP 工具调用失败: " << result.error << std::endl;
+                    std::cerr << "[MathAgent] MCP 工具返回不可用: "
+                              << (result.success ? result.result : result.error) << std::endl;
                 }
             }
         }
@@ -358,12 +366,12 @@ private:
         // 如果没有 calculator，尝试直接使用 calculator（可能 RAG 没检索到）
         if (mcp_integration_->hasToolAvailable("calculator")) {
             json args;
-            args["expression"] = question;
+            args["expression"] = *expression;
             
             std::cout << "[MathAgent] 回退使用 calculator 工具" << std::endl;
             
             auto result = mcp_integration_->callTool("calculator", args.dump());
-            if (result.success) {
+            if (result.success && agent_rpc::examples::is_usable_mcp_tool_result(result.result)) {
                 std::cout << "[MathAgent] MCP 工具返回: " << result.result << std::endl;
                 return result.result;
             }
