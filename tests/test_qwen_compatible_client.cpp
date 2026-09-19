@@ -13,12 +13,17 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <utility>
 
 namespace {
 
 class OneShotHttpServer {
 public:
-    OneShotHttpServer() {
+    OneShotHttpServer(
+        int response_status = 200,
+        std::string response_body = R"({"choices":[{"message":{"content":"local-compatible-response"}}]})")
+        : response_status_(response_status)
+        , response_body_(std::move(response_body)) {
         socket_fd_ = socket(AF_INET, SOCK_STREAM, 0);
         if (socket_fd_ < 0) {
             throw std::runtime_error("failed to create test socket");
@@ -75,15 +80,18 @@ private:
             request_.assign(buffer.data(), static_cast<size_t>(bytes));
         }
 
-        const std::string body = R"({"choices":[{"message":{"content":"local-compatible-response"}}]})";
-        const std::string response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
-            std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+        const std::string status_text = response_status_ == 200 ? "OK" : "Bad Gateway";
+        const std::string response = "HTTP/1.1 " + std::to_string(response_status_) + " " + status_text +
+            "\r\nContent-Type: application/json\r\nContent-Length: " +
+            std::to_string(response_body_.size()) + "\r\nConnection: close\r\n\r\n" + response_body_;
         write(client_fd, response.data(), response.size());
         close(client_fd);
     }
 
     int socket_fd_ = -1;
     int port_ = 0;
+    int response_status_ = 200;
+    std::string response_body_;
     std::string request_;
     std::thread worker_;
 };
@@ -107,6 +115,23 @@ TEST(QwenCompatibleClientTest, UsesCompatibleChatCompletionsEndpoint) {
     EXPECT_NE(server.request().find("test user message"), std::string::npos);
     unsetenv("QWEN_BASE_URL");
     unsetenv("QWEN_MODEL");
+}
+
+TEST(QwenCompatibleClientTest, ReportsHttpStatusAndBodyForNonJsonErrors) {
+    OneShotHttpServer server(502, "Bad Gateway");
+    const std::string base_url = "http://127.0.0.1:" + std::to_string(server.port()) + "/v1";
+    setenv("QWEN_BASE_URL", base_url.c_str(), 1);
+
+    try {
+        QwenClient client("test-key", "qwen-plus");
+        client.chat("system", "user");
+        ADD_FAILURE() << "Expected chat to reject the HTTP error response";
+    } catch (const std::runtime_error& error) {
+        EXPECT_NE(std::string(error.what()).find("HTTP 502"), std::string::npos);
+        EXPECT_NE(std::string(error.what()).find("Bad Gateway"), std::string::npos);
+    }
+
+    unsetenv("QWEN_BASE_URL");
 }
 
 }  // namespace
