@@ -151,10 +151,20 @@ sudo apt-get install -y \
 
 | API Key | 用途 | 获取方式 |
 |---------|------|----------|
-| QWEN_API_KEY | 通义千问 AI 模型，用于对话和意图识别 | [阿里云百炼](https://bailian.console.aliyun.com/) |
-| DASHSCOPE_API_KEY | RAG 向量化服务，用于智能工具选择 | [阿里云 DashScope](https://dashscope.console.aliyun.com/) |
+| QWEN_API_KEY | 对话模型 Key，用于对话和意图识别；支持通义千问及 OpenAI 兼容服务 | [阿里云百炼](https://bailian.console.aliyun.com/) |
+| DASHSCOPE_API_KEY | RAG 向量化服务 Key；仅在启用 RAG 时需要 | [阿里云 DashScope](https://dashscope.console.aliyun.com/) |
 
-> **注意**: 两个 API Key 都是完整功能所必需的。DASHSCOPE_API_KEY 用于 RAG-MCP 的工具向量化和检索功能。
+> **注意**: `QWEN_API_KEY` 是 Agent 启动所必需的。`DASHSCOPE_API_KEY` 只在 `ENABLE_RAG=true` 时用于 RAG-MCP 的工具向量化和检索。
+
+### 使用 OpenAI 兼容的 Qwen 服务（可选）
+
+默认使用 DashScope 原生生成接口。若所用服务提供 OpenAI 兼容的 Chat Completions 接口，设置 `QWEN_BASE_URL` 为包含版本路径的基础地址（不要包含 `/chat/completions`），程序会自动追加该路径；可用 `QWEN_MODEL` 覆盖默认模型名。
+
+```bash
+export QWEN_API_KEY=sk-your-qwen-api-key
+export QWEN_BASE_URL=https://<provider-host>/compatible-mode/v1
+export QWEN_MODEL=qwen-plus
+```
 
 ---
 
@@ -237,7 +247,12 @@ cd ../..
 # 必需：通义千问 API Key（用于 AI 对话和意图识别）
 export QWEN_API_KEY=sk-your-qwen-api-key
 
-# 必需：DashScope API Key（用于 RAG 智能工具选择）
+# 可选：使用 OpenAI 兼容的 Qwen 服务时设置
+# 基础地址不要包含 /chat/completions
+export QWEN_BASE_URL=https://<provider-host>/compatible-mode/v1
+export QWEN_MODEL=qwen-plus
+
+# 仅在 ENABLE_RAG=true 时需要：DashScope API Key（用于 RAG 智能工具选择）
 # RAG 会将工具描述向量化存储，查询时动态检索相关工具
 export DASHSCOPE_API_KEY=sk-your-dashscope-api-key
 ```
@@ -455,7 +470,10 @@ Relevant Tools (3):
 ```bash
 # 设置环境变量
 export QWEN_API_KEY=sk-your-qwen-api-key
-export DASHSCOPE_API_KEY=sk-your-dashscope-api-key  # 用于 RAG 智能工具选择
+# 可选：通过 OpenAI 兼容接口调用 Qwen
+export QWEN_BASE_URL=https://<provider-host>/compatible-mode/v1
+export QWEN_MODEL=qwen-plus
+export DASHSCOPE_API_KEY=sk-your-dashscope-api-key  # 仅在启用 RAG 时需要
 
 # 启动 Redis
 sudo systemctl start redis-server
@@ -484,7 +502,6 @@ ls mcp_server_integrated/build/mcp_server
     math-1 \
     5001 \
     http://localhost:8500 \
-    $QWEN_API_KEY \
     --redis-host 127.0.0.1 \
     --redis-port 6379 \
     --enable-mcp \
@@ -514,7 +531,6 @@ ls mcp_server_integrated/build/mcp_server
     orch-1 \
     5000 \
     http://localhost:8500 \
-    $QWEN_API_KEY \
     --redis-host 127.0.0.1 \
     --redis-port 6379 \
     --enable-mcp \
@@ -889,18 +905,26 @@ export DASHSCOPE_API_KEY=sk-your-dashscope-api-key
 
 | 变量 | 必需 | 说明 | 获取方式 |
 |------|------|------|----------|
-| QWEN_API_KEY | **是** | 通义千问 API Key，用于 AI 对话和意图识别 | [阿里云百炼](https://bailian.console.aliyun.com/) |
-| DASHSCOPE_API_KEY | **是** | DashScope API Key，用于 RAG 向量化和智能工具选择 | [阿里云 DashScope](https://dashscope.console.aliyun.com/) |
+| QWEN_API_KEY | **是** | 对话模型 Key，用于 AI 对话和意图识别 | [阿里云百炼](https://bailian.console.aliyun.com/) |
+| QWEN_BASE_URL | 否 | OpenAI 兼容服务的基础地址；程序自动追加 `/chat/completions` | - |
+| QWEN_MODEL | 否 | 覆盖 Qwen 模型名（默认：`qwen-plus`） | - |
+| DASHSCOPE_API_KEY | 条件必需 | 启用 `ENABLE_RAG=true` 时，用于 RAG 向量化和智能工具选择 | [阿里云 DashScope](https://dashscope.console.aliyun.com/) |
 | ENABLE_MCP | 否 | 是否启用 MCP 工具 (true/false，默认 false) | - |
 | ENABLE_RAG | 否 | 是否启用 RAG 智能工具选择 (true/false，默认 false) | - |
 | RAG_TOP_K | 否 | RAG 返回工具数量 (默认: 5) | - |
 | RAG_THRESHOLD | 否 | RAG 相似度阈值 (默认: 0.3) | - |
+| REGISTRY_PORT | 否 | `start_system.sh` 的 Registry 端口（默认：8500） | - |
+| ORCHESTRATOR_PORT | 否 | `start_system.sh` 的 Orchestrator 端口（默认：5000） | - |
+| MATH_AGENT_PORT | 否 | `start_system.sh` 的 Math Agent 端口（默认：5001） | - |
 | RPC_SERVER_PORT | 否 | RPC Server 端口 (默认: 50051) | - |
 | ORCHESTRATOR_URL | 否 | Orchestrator 地址 (默认: http://localhost:5000) | - |
 
 ```bash
 # 设置所有环境变量（完整功能）
 export QWEN_API_KEY=sk-your-qwen-api-key
+# 使用兼容服务时，设置基础地址和模型名
+export QWEN_BASE_URL=https://<provider-host>/compatible-mode/v1
+export QWEN_MODEL=qwen-plus
 export DASHSCOPE_API_KEY=sk-your-dashscope-api-key
 export ENABLE_MCP=true
 export ENABLE_RAG=true
@@ -912,7 +936,13 @@ export RAG_THRESHOLD=0.3
 
 ```bash
 # Orchestrator / Math Agent 通用参数
-./ai_orchestrator <agent_id> <port> <registry_url> <api_key> [选项]
+./ai_orchestrator <agent_id> <port> <registry_url> [api_key] [选项]
+
+# 推荐：通过环境变量传递 Key，避免 Key 出现在进程参数中
+export QWEN_API_KEY=sk-your-qwen-api-key
+./ai_orchestrator orch-1 5000 http://localhost:8500 [选项]
+
+# 位置参数 api_key 为向后兼容保留；未提供时读取 QWEN_API_KEY。
 
 选项:
   --redis-host <host>     Redis 主机 (默认: 127.0.0.1)
@@ -1022,6 +1052,10 @@ echo $QWEN_API_KEY
 
 # 重新设置
 export QWEN_API_KEY=sk-your-actual-api-key
+
+# 如使用 OpenAI 兼容服务，确认基础地址不含 /chat/completions
+export QWEN_BASE_URL=https://<provider-host>/compatible-mode/v1
+export QWEN_MODEL=qwen-plus
 ```
 
 ### Q: MCP 工具不可用
