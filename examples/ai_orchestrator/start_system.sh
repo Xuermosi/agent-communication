@@ -20,9 +20,9 @@ if [ ! -f "$BIN_DIR/ai_registry_server" ]; then
 fi
 
 # 配置
-REGISTRY_PORT=8500
-ORCHESTRATOR_PORT=5000
-MATH_AGENT_PORT=5001
+REGISTRY_PORT="${REGISTRY_PORT:-8500}"
+ORCHESTRATOR_PORT="${ORCHESTRATOR_PORT:-5000}"
+MATH_AGENT_PORT="${MATH_AGENT_PORT:-5001}"
 REDIS_HOST="127.0.0.1"
 REDIS_PORT=6379
 
@@ -38,11 +38,8 @@ RAG_TOP_K="${RAG_TOP_K:-5}"
 RAG_THRESHOLD="${RAG_THRESHOLD:-0.3}"
 DASHSCOPE_API_KEY="${DASHSCOPE_API_KEY:-}"
 
-# API Key (请替换为你的 API Key)
-API_KEY="${QWEN_API_KEY:-sk-your-api-key}"
-
-# 检查 API Key
-if [ "$API_KEY" == "sk-your-api-key" ]; then
+# API Key 仅从环境变量读取，避免出现在进程参数中。
+if [ -z "${QWEN_API_KEY:-}" ]; then
     echo "警告: 请设置 QWEN_API_KEY 环境变量"
     echo "export QWEN_API_KEY=sk-xxx"
     exit 1
@@ -86,14 +83,14 @@ fi
 
 # 2. 启动 Math Agent
 echo "[2/3] 启动 Math Agent..."
-"$BIN_DIR/ai_math_agent" math-1 $MATH_AGENT_PORT http://localhost:$REGISTRY_PORT $API_KEY --redis-host $REDIS_HOST --redis-port $REDIS_PORT $MCP_ARGS $RAG_ARGS > "$SCRIPT_DIR/logs/math_agent.log" 2>&1 &
+"$BIN_DIR/ai_math_agent" math-1 $MATH_AGENT_PORT http://localhost:$REGISTRY_PORT --redis-host $REDIS_HOST --redis-port $REDIS_PORT $MCP_ARGS $RAG_ARGS > "$SCRIPT_DIR/logs/math_agent.log" 2>&1 &
 echo $! > "$SCRIPT_DIR/pids/math_agent.pid"
 sleep 1
 echo "Math Agent 启动完成 (端口: $MATH_AGENT_PORT)"
 
 # 3. 启动 Orchestrator
 echo "[3/3] 启动 Orchestrator..."
-"$BIN_DIR/ai_orchestrator" orch-1 $ORCHESTRATOR_PORT http://localhost:$REGISTRY_PORT $API_KEY --redis-host $REDIS_HOST --redis-port $REDIS_PORT $MCP_ARGS $RAG_ARGS > "$SCRIPT_DIR/logs/orchestrator.log" 2>&1 &
+"$BIN_DIR/ai_orchestrator" orch-1 $ORCHESTRATOR_PORT http://localhost:$REGISTRY_PORT --redis-host $REDIS_HOST --redis-port $REDIS_PORT $MCP_ARGS $RAG_ARGS > "$SCRIPT_DIR/logs/orchestrator.log" 2>&1 &
 echo $! > "$SCRIPT_DIR/pids/orchestrator.pid"
 sleep 1
 echo "Orchestrator 启动完成 (端口: $ORCHESTRATOR_PORT)"

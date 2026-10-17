@@ -14,6 +14,11 @@ Makefile
 *.key
 *.log
 
+# Generated local runtime and subproject build output
+/examples/ai_orchestrator/pids/
+/examples/ai_orchestrator/logs/
+/mcp_server_integrated/build/
+
 # Editor and OS metadata
 .DS_Store
 .idea/

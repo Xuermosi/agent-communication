@@ -277,3 +277,17 @@ target_include_directories(test_agent_communication PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR}/../proto
 )
 add_test(NAME AgentCommunicationIntegrationTest COMMAND test_agent_communication)
+
+# Qwen OpenAI-compatible endpoint test
+add_executable(test_qwen_compatible_client test_qwen_compatible_client.cpp)
+target_link_libraries(test_qwen_compatible_client
+    GTest::gtest
+    GTest::gtest_main
+    pthread
+    CURL::libcurl
+)
+target_include_directories(test_qwen_compatible_client PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../a2a/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../a2a/third_party
+)
+add_test(NAME QwenCompatibleClientTest COMMAND test_qwen_compatible_client)
